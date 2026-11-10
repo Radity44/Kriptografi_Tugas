@@ -16,7 +16,7 @@ class DocumentIntegrityServiceTest extends TestCase
 
         // Buat file temporary
         $tmp = tempnam(sys_get_temp_dir(), 'test_cv_');
-        $content = "%PDF-1.4 Test Curriculum Vitae Content for Cryptography Research";
+        $content = '%PDF-1.4 Test Curriculum Vitae Content for Cryptography Research';
         file_put_contents($tmp, $content);
 
         $hash = $service->calculateFileHash($tmp);
@@ -28,7 +28,7 @@ class DocumentIntegrityServiceTest extends TestCase
 
     public function test_integrity_verification_returns_valid_when_cloud_file_is_identical(): void
     {
-        $content = "%PDF-1.4 Original Unmodified CV Content";
+        $content = '%PDF-1.4 Original Unmodified CV Content';
         $originalHash = hash('sha256', $content);
 
         $mockStorage = $this->createMock(SupabaseStorageService::class);
@@ -55,11 +55,11 @@ class DocumentIntegrityServiceTest extends TestCase
 
     public function test_integrity_verification_returns_tampered_when_cloud_file_is_modified(): void
     {
-        $originalContent = "%PDF-1.4 Original CV Content";
+        $originalContent = '%PDF-1.4 Original CV Content';
         $originalHash = hash('sha256', $originalContent);
 
         // Simulasi perubahan byte pada file cloud
-        $tamperedContent = "%PDF-1.4 Tampered CV Content with altered bytes!";
+        $tamperedContent = '%PDF-1.4 Tampered CV Content with altered bytes!';
         $tamperedHash = hash('sha256', $tamperedContent);
 
         $mockStorage = $this->createMock(SupabaseStorageService::class);

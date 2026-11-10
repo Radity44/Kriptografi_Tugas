@@ -2,7 +2,6 @@
 
 namespace App\Http\Middleware;
 
-use App\Models\User;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -14,7 +13,7 @@ class EnsureMahasiswa
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (!$request->user() || !$request->user()->isMahasiswa()) {
+        if (! $request->user() || ! $request->user()->isMahasiswa()) {
             abort(403, 'Akses Ditolak: Halaman ini khusus untuk akun Mahasiswa.');
         }
 

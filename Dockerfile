@@ -38,3 +38,4 @@ EXPOSE 80
 
 # Script startup: jalankan php-fpm dan nginx
 CMD php-fpm -D && nginx -g "daemon off;"
+

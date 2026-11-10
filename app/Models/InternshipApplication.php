@@ -12,7 +12,9 @@ class InternshipApplication extends Model
     use HasFactory;
 
     public const STATUS_MENUNGGU = 'menunggu';
+
     public const STATUS_DITERIMA = 'diterima';
+
     public const STATUS_DITOLAK = 'ditolak';
 
     protected $fillable = [

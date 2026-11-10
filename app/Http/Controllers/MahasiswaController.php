@@ -88,21 +88,23 @@ class MahasiswaController extends Controller
         try {
             $sha256Hash = $this->integrityService->calculateFileHash($file->getRealPath());
         } catch (Exception $e) {
-            Log::error('SHA-256 calculation error: ' . $e->getMessage());
-            return back()->withInput()->withErrors(['cv' => 'Gagal menghitung SHA-256 file: ' . $e->getMessage()]);
+            Log::error('SHA-256 calculation error: '.$e->getMessage());
+
+            return back()->withInput()->withErrors(['cv' => 'Gagal menghitung SHA-256 file: '.$e->getMessage()]);
         }
 
         // 2. Buat storage path unik di Supabase
         $safeFilename = Str::slug(pathinfo($originalFilename, PATHINFO_FILENAME));
         $extension = $file->getClientOriginalExtension();
-        $uniqueStoragePath = 'cv/' . Auth::id() . '/' . time() . '_' . Str::random(8) . '_' . $safeFilename . '.' . $extension;
+        $uniqueStoragePath = 'cv/'.Auth::id().'/'.time().'_'.Str::random(8).'_'.$safeFilename.'.'.$extension;
 
         // 3. Upload ke Supabase Storage (private bucket)
         try {
             $this->storageService->upload($uniqueStoragePath, $file->getRealPath(), $mimeType);
         } catch (Exception $e) {
-            Log::error('Supabase upload error: ' . $e->getMessage());
-            return back()->withInput()->withErrors(['cv' => 'Gagal mengunggah CV ke Supabase Storage: ' . $e->getMessage()]);
+            Log::error('Supabase upload error: '.$e->getMessage());
+
+            return back()->withInput()->withErrors(['cv' => 'Gagal mengunggah CV ke Supabase Storage: '.$e->getMessage()]);
         }
 
         // 4. Simpan ke database dalam transaction
@@ -128,8 +130,9 @@ class MahasiswaController extends Controller
             DB::commit();
         } catch (Exception $e) {
             DB::rollBack();
-            Log::error('Database save error: ' . $e->getMessage());
-            return back()->withInput()->withErrors(['cv' => 'Gagal menyimpan data pengajuan: ' . $e->getMessage()]);
+            Log::error('Database save error: '.$e->getMessage());
+
+            return back()->withInput()->withErrors(['cv' => 'Gagal menyimpan data pengajuan: '.$e->getMessage()]);
         }
 
         return redirect()->route('mahasiswa.pengajuan.show', $application->id)
@@ -151,19 +154,19 @@ class MahasiswaController extends Controller
             ->where('user_id', Auth::id())
             ->findOrFail($id);
 
-        if (!$application->document) {
+        if (! $application->document) {
             abort(404, 'Dokumen CV tidak ditemukan.');
         }
 
         try {
             $fileContent = $this->storageService->download($application->document->storage_path);
         } catch (Exception $e) {
-            abort(500, 'Gagal mengambil dokumen CV dari cloud: ' . $e->getMessage());
+            abort(500, 'Gagal mengambil dokumen CV dari cloud: '.$e->getMessage());
         }
 
         return response($fileContent, 200, [
             'Content-Type' => $application->document->mime_type ?: 'application/pdf',
-            'Content-Disposition' => 'inline; filename="' . $application->document->original_filename . '"',
+            'Content-Disposition' => 'inline; filename="'.$application->document->original_filename.'"',
         ]);
     }
 }

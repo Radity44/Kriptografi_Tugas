@@ -13,6 +13,7 @@ Route::get('/', function () {
             ? redirect()->route('admin.dashboard')
             : redirect()->route('mahasiswa.dashboard');
     }
+
     return redirect()->route('login');
 });
 

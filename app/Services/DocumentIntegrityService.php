@@ -15,13 +15,13 @@ class DocumentIntegrityService
     /**
      * Hitung SHA-256 dari file lokal (misal saat upload).
      *
-     * @param string $filePath
      * @return string 64-karakter hex hash
+     *
      * @throws Exception
      */
     public function calculateFileHash(string $filePath): string
     {
-        if (!file_exists($filePath)) {
+        if (! file_exists($filePath)) {
             throw new Exception("File tidak ditemukan: {$filePath}");
         }
 
@@ -35,9 +35,6 @@ class DocumentIntegrityService
 
     /**
      * Hitung SHA-256 dari string/binary content.
-     *
-     * @param string $content
-     * @return string
      */
     public function calculateContentHash(string $content): string
     {
@@ -54,7 +51,6 @@ class DocumentIntegrityService
      * 4. Bandingkan secara aman menggunakan hash_equals() terhadap original_sha256
      * 5. Return status: VALID jika identik, TAMPERED jika berbeda
      *
-     * @param ApplicationDocument $document
      * @return array{
      *     is_valid: bool,
      *     status: string,
@@ -64,6 +60,7 @@ class DocumentIntegrityService
      *     verified_at: string,
      *     notes: string
      * }
+     *
      * @throws Exception
      */
     public function verifyIntegrity(ApplicationDocument $document): array

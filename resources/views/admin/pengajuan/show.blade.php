@@ -291,7 +291,7 @@
         spinner.classList.remove('bi-arrow-repeat');
 
         try {
-            const response = await fetch("{{ route('admin.pengajuan.verify', $application->id) }}", {
+            const response = await fetch("{{ route('admin.pengajuan.verify', $application->id, false) }}", {
                 method: "POST",
                 headers: {
                     "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute('content'),

@@ -14,6 +14,9 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        // Percayai semua reverse proxy dari platform hosting (Railway/Render) untuk HTTPS
+        $middleware->trustProxies(at: '*');
+
         $middleware->alias([
             'admin' => EnsureAdmin::class,
             'mahasiswa' => EnsureMahasiswa::class,

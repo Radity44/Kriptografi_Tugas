@@ -33,9 +33,11 @@ RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cac
 RUN mkdir -p /run/nginx
 COPY docker/nginx.conf /etc/nginx/http.d/default.conf
 
-# Expose port 80 untuk hosting
-EXPOSE 80
+# Berikan izin eksekusi entrypoint
+RUN chmod +x /var/www/html/docker/entrypoint.sh
 
-# Script startup: jalankan php-fpm dan nginx
-CMD php-fpm -D && nginx -g "daemon off;"
+# Expose port (kompatibel Railway & Render)
+EXPOSE 80 8080 3000
 
+# Script startup dinamis untuk port Railway
+CMD ["/var/www/html/docker/entrypoint.sh"]

@@ -1,43 +1,37 @@
-# Gunakan PHP 8.3 FPM Alpine
-FROM php:8.3-fpm-alpine
+# Gunakan PHP 8.3 CLI Alpine yang ringan dan stabil
+FROM php:8.3-cli-alpine
 
-# Install ekstensi sistem yang dibutuhkan
+# Install library pendukung sistem untuk PostgreSQL, Zip, dan Curl
 RUN apk add --no-cache \
-    nginx \
     postgresql-dev \
     libzip-dev \
     zip \
     unzip \
     curl
 
-# Install ekstensi PHP: pdo_pgsql, pgsql, zip
+# Install ekstensi PHP: pdo, pdo_pgsql, pgsql, zip
 RUN docker-php-ext-install pdo pdo_pgsql pgsql zip
 
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Atur working directory
+# Atur direktori kerja aplikasi
 WORKDIR /var/www/html
 
-# Salin seluruh kode project
+# Salin seluruh source code project
 COPY . .
 
-# Install dependencies PHP tanpa dev
+# Install dependencies composer untuk production
 RUN composer install --no-dev --optimize-autoloader --no-interaction
 
-# Set permission folder storage dan bootstrap cache
-RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache \
-    && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
+# Berikan izin tulis penuh pada folder storage dan cache
+RUN chmod -R 777 /var/www/html/storage /var/www/html/bootstrap/cache
 
-# Salin konfigurasi Nginx sederhana
-RUN mkdir -p /run/nginx
-COPY docker/nginx.conf /etc/nginx/http.d/default.conf
+# Port default
+EXPOSE 8080
 
-# Berikan izin eksekusi entrypoint
-RUN chmod +x /var/www/html/docker/entrypoint.sh
+# Multi-worker untuk menangani concurrent request
+ENV PHP_CLI_SERVER_WORKERS=4
 
-# Expose port (kompatibel Railway & Render)
-EXPOSE 80 8080 3000
-
-# Script startup dinamis untuk port Railway
-CMD ["/var/www/html/docker/entrypoint.sh"]
+# Startup script yang membaca $PORT dinamis dari Railway secara langsung
+CMD ["sh", "-c", "php artisan config:clear && php artisan route:clear && php artisan serve --host=0.0.0.0 --port=${PORT:-8080}"]
